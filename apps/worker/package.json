@@ -1,0 +1,19 @@
+{
+  "name": "worker",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "scrape": "tsx --env-file=../web/.env.local src/scheduler/run-scraper.ts"
+  },
+  "dependencies": {
+    "cheerio": "^1.0.0",
+    "drizzle-orm": "^0.45.2",
+    "postgres": "^3.4.9"
+  },
+  "devDependencies": {
+    "@types/node": "^20",
+    "tsx": "^4.23.12",
+    "typescript": "^5"
+  }
+}
