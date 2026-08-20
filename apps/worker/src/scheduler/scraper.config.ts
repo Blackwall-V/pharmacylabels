@@ -23,7 +23,7 @@ export const scraperConfigs: Record<string, ChainScraperConfig> = {
     minDelayMs: 1500,
     respectRobotsTxt: true,
     notes:
-      "Angular SPA with no data in initial HTML; lazy-loaded chunks not discoverable via plain HTTP. Needs a Playwright-based scraper (network interception on api.cruzverde.cl) -- not implemented yet.",
+      "Angular SPA with no data in initial HTML. Product data comes from api.cruzverde.cl/product-service/products/detail/{id}, behind an Incapsula WAF that requires a browser-established session -- scraped via Playwright, intercepting that response instead of parsing the DOM. Also the richest data source of the three: includes live stock count and a structured `prescription` field (absent/simple/restricted).",
   },
   salcobrand: {
     chainSlug: "salcobrand",

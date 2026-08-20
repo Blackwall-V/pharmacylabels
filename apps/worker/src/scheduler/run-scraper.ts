@@ -4,6 +4,7 @@ import { db } from "../../../web/src/db/index";
 import { pharmacyChains, scrapeRuns } from "../../../web/src/db/schema";
 import { fasaScraper } from "../scrapers/fasa.scraper";
 import { salcobrandScraper } from "../scrapers/salcobrand.scraper";
+import { cruzVerdeScraper } from "../scrapers/cruzverde.scraper";
 import { persistScrapedProduct } from "../pipeline/persist";
 import type { PharmacyScraper } from "../scrapers/types";
 
@@ -13,11 +14,13 @@ const USER_AGENT =
 const scrapers: Record<string, PharmacyScraper> = {
   "farmacias-ahumada": fasaScraper,
   salcobrand: salcobrandScraper,
+  "cruz-verde": cruzVerdeScraper,
 };
 
 const SITEMAP_URLS: Record<string, string> = {
   "farmacias-ahumada": "https://www.farmaciasahumada.cl/sitemap_0-product.xml",
   salcobrand: "https://salcobrand.cl/sitemap3.xml",
+  "cruz-verde": "https://www.cruzverde.cl/sitemap_0-product.xml",
 };
 
 function delay(ms: number) {

@@ -10,7 +10,10 @@ async function main() {
         slug: "cruz-verde",
         name: "Cruz Verde",
         websiteUrl: "https://www.cruzverde.cl",
-        scraperEnabled: false,
+        // Validated via Playwright: product data comes from api.cruzverde.cl/product-service,
+        // behind an Incapsula WAF requiring a browser session -- see
+        // apps/worker/src/scrapers/cruzverde.scraper.ts.
+        scraperEnabled: true,
       },
       {
         slug: "salcobrand",
