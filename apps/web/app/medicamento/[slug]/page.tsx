@@ -56,9 +56,9 @@ export default async function MedicamentoPage({
         ← Volver a la búsqueda
       </Link>
 
-      <div className="mt-4 flex items-start justify-between gap-4">
-        <div>
-          <h1 className="text-2xl font-semibold text-zinc-900 dark:text-zinc-50">
+      <div className="mt-4 flex flex-wrap items-start justify-between gap-4">
+        <div className="min-w-0">
+          <h1 className="break-words text-2xl font-semibold text-zinc-900 dark:text-zinc-50">
             {medication.canonicalName}
           </h1>
           {medication.activeIngredient && (
@@ -69,7 +69,9 @@ export default async function MedicamentoPage({
             </p>
           )}
         </div>
-        <RegulatoryBadge regulatoryClass={medication.regulatoryClass} />
+        <span className="shrink-0">
+          <RegulatoryBadge regulatoryClass={medication.regulatoryClass} />
+        </span>
       </div>
 
       <div className="mt-8">
@@ -82,19 +84,19 @@ export default async function MedicamentoPage({
           <ul className="divide-y divide-zinc-200 rounded-md border border-zinc-200 dark:divide-zinc-800 dark:border-zinc-800">
             {sortedRows.map(({ mapping, chain, latestPrice }, i) => (
               <li key={mapping.id} className="flex items-center justify-between gap-4 p-4">
-                <div>
-                  <p className="font-medium text-zinc-900 dark:text-zinc-50">
+                <div className="min-w-0">
+                  <p className="truncate font-medium text-zinc-900 dark:text-zinc-50">
                     <Link href={`/farmacia/${chain.slug}`} className="hover:underline">
                       {chain.name}
                     </Link>{" "}
                     {i === 0 && <span className="ml-1 text-xs text-emerald-600">· más barato</span>}
                   </p>
-                  <p className="text-xs text-zinc-500">
+                  <p className="truncate text-xs text-zinc-500">
                     actualizado {timeAgo(latestPrice!.scrapedAt)}
                     {!latestPrice!.inStock && " · sin stock"}
                   </p>
                 </div>
-                <p className="text-lg font-semibold text-zinc-900 dark:text-zinc-50">
+                <p className="shrink-0 text-lg font-semibold text-zinc-900 dark:text-zinc-50">
                   ${latestPrice!.priceClp.toLocaleString("es-CL")}
                 </p>
               </li>

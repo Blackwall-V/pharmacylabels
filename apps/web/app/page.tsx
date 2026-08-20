@@ -13,7 +13,7 @@ export default function Home() {
             type="text"
             name="q"
             placeholder="Ej: paracetamol, ibuprofeno..."
-            className="flex-1 rounded-md border border-zinc-300 px-4 py-2 text-zinc-900 focus:outline-none focus:ring-2 focus:ring-emerald-500 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-50"
+            className="min-w-0 flex-1 rounded-md border border-zinc-300 px-4 py-2 text-zinc-900 focus:outline-none focus:ring-2 focus:ring-emerald-500 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-50"
           />
           <button
             type="submit"

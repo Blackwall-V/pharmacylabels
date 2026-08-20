@@ -2,15 +2,27 @@
 
 import { eq } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
+import { redirect } from "next/navigation";
 import { db } from "@/src/db";
 import { chainProductMappings, medications } from "@/src/db/schema";
+import { verifyAdminSession, deleteAdminSession } from "@/src/lib/session";
+import { slugify } from "@/src/lib/slugify";
+import { parseId, parseRequiredName } from "@/src/lib/validation";
 
-// NOTE: MVP has no admin auth yet -- see plan Milestone 4. Do not expose this route
-// publicly without adding session auth first.
+// Proxy only does an optimistic cookie check; every mutation here re-verifies the
+// session, since Server Actions are reachable directly via POST regardless of proxy.
+async function requireAdmin() {
+  if (!(await verifyAdminSession())) {
+    throw new Error("Unauthorized");
+  }
+}
 
 export async function confirmMapping(formData: FormData) {
-  const mappingId = Number(formData.get("mappingId"));
-  const medicationId = Number(formData.get("medicationId"));
+  await requireAdmin();
+  const mappingId = parseId(formData.get("mappingId"));
+  const medicationId = parseId(formData.get("medicationId"));
+  if (!mappingId || !medicationId) return;
+
   await db
     .update(chainProductMappings)
     .set({ medicationId, matchStatus: "confirmed", matchedBy: "manual" })
@@ -18,19 +30,11 @@ export async function confirmMapping(formData: FormData) {
   revalidatePath("/admin/matching-queue");
 }
 
-function slugify(name: string): string {
-  return name
-    .normalize("NFD")
-    .replace(/[̀-ͯ]/g, "")
-    .toLowerCase()
-    .replace(/[^a-z0-9]+/g, "-")
-    .replace(/^-+|-+$/g, "");
-}
-
 export async function createMedicationFromMapping(formData: FormData) {
-  const mappingId = Number(formData.get("mappingId"));
-  const canonicalName = String(formData.get("canonicalName") || "").trim();
-  if (!canonicalName) return;
+  await requireAdmin();
+  const mappingId = parseId(formData.get("mappingId"));
+  const canonicalName = parseRequiredName(formData.get("canonicalName"));
+  if (!mappingId || !canonicalName) return;
 
   let slug = slugify(canonicalName);
   const [clash] = await db.select().from(medications).where(eq(medications.slug, slug)).limit(1);
@@ -55,10 +59,18 @@ export async function createMedicationFromMapping(formData: FormData) {
 }
 
 export async function rejectMapping(formData: FormData) {
-  const mappingId = Number(formData.get("mappingId"));
+  await requireAdmin();
+  const mappingId = parseId(formData.get("mappingId"));
+  if (!mappingId) return;
+
   await db
     .update(chainProductMappings)
     .set({ matchStatus: "no_match", medicationId: null })
     .where(eq(chainProductMappings.id, mappingId));
   revalidatePath("/admin/matching-queue");
+}
+
+export async function logout() {
+  await deleteAdminSession();
+  redirect("/admin/login");
 }

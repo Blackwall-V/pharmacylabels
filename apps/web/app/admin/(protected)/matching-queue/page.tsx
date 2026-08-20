@@ -4,6 +4,10 @@ import { db } from "@/src/db";
 import { chainProductMappings, pharmacyChains } from "@/src/db/schema";
 import { confirmMapping, rejectMapping, createMedicationFromMapping } from "../actions";
 
+// Without this, Next.js statically optimizes admin pages at build time and would
+// serve a frozen snapshot instead of the live matching queue.
+export const dynamic = "force-dynamic";
+
 interface CandidateRow {
   [key: string]: unknown;
   id: number;
@@ -72,13 +76,13 @@ export default async function MatchingQueuePage() {
               </form>
             </div>
 
-            <form action={createMedicationFromMapping} className="mt-3 flex gap-2">
+            <form action={createMedicationFromMapping} className="mt-3 flex flex-col gap-2 sm:flex-row">
               <input type="hidden" name="mappingId" value={mapping.id} />
               <input
                 name="canonicalName"
                 defaultValue={mapping.chainProductName}
                 placeholder="Nombre canónico del medicamento nuevo"
-                className="flex-1 rounded border border-zinc-300 px-2 py-1 text-sm dark:border-zinc-700 dark:bg-zinc-900"
+                className="min-w-0 flex-1 rounded border border-zinc-300 px-2 py-1 text-sm dark:border-zinc-700 dark:bg-zinc-900"
               />
               <button
                 type="submit"

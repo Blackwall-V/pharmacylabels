@@ -54,7 +54,7 @@ export default async function BuscarPage({
           name="q"
           defaultValue={q}
           placeholder="Buscar medicamento..."
-          className="flex-1 rounded-md border border-zinc-300 px-4 py-2 dark:border-zinc-700 dark:bg-zinc-900"
+          className="min-w-0 flex-1 rounded-md border border-zinc-300 px-4 py-2 dark:border-zinc-700 dark:bg-zinc-900"
         />
         <button type="submit" className="rounded-md bg-emerald-600 px-5 py-2 font-medium text-white">
           Buscar
@@ -68,13 +68,15 @@ export default async function BuscarPage({
               href={`/medicamento/${med.slug}`}
               className="flex items-center justify-between gap-4 hover:text-emerald-700 dark:hover:text-emerald-400"
             >
-              <div>
-                <p className="font-medium text-zinc-900 dark:text-zinc-50">{med.canonical_name}</p>
+              <div className="min-w-0">
+                <p className="truncate font-medium text-zinc-900 dark:text-zinc-50">{med.canonical_name}</p>
                 {med.active_ingredient && (
-                  <p className="text-sm text-zinc-500">{med.active_ingredient}</p>
+                  <p className="truncate text-sm text-zinc-500">{med.active_ingredient}</p>
                 )}
               </div>
-              <RegulatoryBadge regulatoryClass={med.regulatory_class} />
+              <span className="shrink-0">
+                <RegulatoryBadge regulatoryClass={med.regulatory_class} />
+              </span>
             </Link>
           </li>
         ))}

@@ -3,6 +3,10 @@ import { db } from "@/src/db";
 import { promotions, pharmacyChains } from "@/src/db/schema";
 import { createPromotion } from "./actions";
 
+// Without this, Next.js statically optimizes admin pages at build time and would
+// serve a frozen snapshot instead of live data.
+export const dynamic = "force-dynamic";
+
 const DAY_LABELS = ["Dom", "Lun", "Mar", "Mié", "Jue", "Vie", "Sáb"];
 
 export default async function AdminPromotionsPage() {
@@ -22,7 +26,7 @@ export default async function AdminPromotionsPage() {
       </p>
 
       <form action={createPromotion} className="mt-8 space-y-3 rounded-md border border-zinc-200 p-4 dark:border-zinc-800">
-        <div className="grid grid-cols-2 gap-3">
+        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
           <select name="chainId" required className="rounded border border-zinc-300 px-2 py-1.5 dark:border-zinc-700 dark:bg-zinc-900">
             <option value="">Cadena...</option>
             {chains.map((c) => (
@@ -38,7 +42,7 @@ export default async function AdminPromotionsPage() {
         <input name="title" required placeholder="Título (ej: Martes de descuento adulto mayor)" className="w-full rounded border border-zinc-300 px-2 py-1.5 dark:border-zinc-700 dark:bg-zinc-900" />
         <textarea name="description" placeholder="Descripción" className="w-full rounded border border-zinc-300 px-2 py-1.5 dark:border-zinc-700 dark:bg-zinc-900" />
         <input name="category" placeholder="Categoría (si aplica)" className="w-full rounded border border-zinc-300 px-2 py-1.5 dark:border-zinc-700 dark:bg-zinc-900" />
-        <div className="grid grid-cols-2 gap-3">
+        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
           <select name="discountType" className="rounded border border-zinc-300 px-2 py-1.5 dark:border-zinc-700 dark:bg-zinc-900">
             <option value="">Tipo de descuento...</option>
             <option value="percentage">Porcentaje</option>
@@ -57,7 +61,7 @@ export default async function AdminPromotionsPage() {
             ))}
           </div>
         </div>
-        <div className="grid grid-cols-2 gap-3">
+        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
           <input name="validFrom" type="date" className="rounded border border-zinc-300 px-2 py-1.5 dark:border-zinc-700 dark:bg-zinc-900" />
           <input name="validTo" type="date" className="rounded border border-zinc-300 px-2 py-1.5 dark:border-zinc-700 dark:bg-zinc-900" />
         </div>

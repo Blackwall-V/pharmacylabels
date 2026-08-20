@@ -3,6 +3,11 @@ import { eq, desc } from "drizzle-orm";
 import { db } from "@/src/db";
 import { promotions, pharmacyChains } from "@/src/db/schema";
 
+// Without this, Next.js statically optimizes this page at build time (no cookies/
+// searchParams/params to signal otherwise) and would serve a frozen snapshot of
+// promotions to every visitor instead of live data.
+export const dynamic = "force-dynamic";
+
 const DAY_LABELS = ["domingo", "lunes", "martes", "miércoles", "jueves", "viernes", "sábado"];
 
 export default async function PromocionesPage() {
@@ -23,9 +28,9 @@ export default async function PromocionesPage() {
       <ul className="mt-6 space-y-4">
         {active.map(({ promotion, chain }) => (
           <li key={promotion.id} className="rounded-md border border-zinc-200 p-4 dark:border-zinc-800">
-            <div className="flex items-center justify-between">
-              <p className="font-medium text-zinc-900 dark:text-zinc-50">{promotion.title}</p>
-              <Link href={`/farmacia/${chain.slug}`} className="text-sm text-emerald-700 hover:underline dark:text-emerald-400">
+            <div className="flex flex-wrap items-center justify-between gap-x-4 gap-y-1">
+              <p className="min-w-0 break-words font-medium text-zinc-900 dark:text-zinc-50">{promotion.title}</p>
+              <Link href={`/farmacia/${chain.slug}`} className="shrink-0 text-sm text-emerald-700 hover:underline dark:text-emerald-400">
                 {chain.name}
               </Link>
             </div>
