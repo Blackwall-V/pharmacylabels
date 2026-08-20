@@ -30,7 +30,8 @@ export const scraperConfigs: Record<string, ChainScraperConfig> = {
     cronExpression: "0 6 * * *",
     minDelayMs: 1500,
     respectRobotsTxt: true,
-    notes: "robots.txt permits crawling; page rendering approach not yet investigated. Feasibility pending.",
+    notes:
+      "Server-rendered (Spree Commerce). Each product page embeds a `product_traker_data` JS object with sku/name/price/stock and a structured saleType field (not_drug/prescription/restricted) that maps cleanly to venta_libre/receta_simple/receta_retenida. robots.txt allows product pages.",
   },
   "dr-simi": {
     chainSlug: "dr-simi",

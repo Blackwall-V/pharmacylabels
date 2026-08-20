@@ -16,7 +16,10 @@ async function main() {
         slug: "salcobrand",
         name: "Salcobrand",
         websiteUrl: "https://salcobrand.cl",
-        scraperEnabled: false,
+        // Validated: server-rendered (Spree Commerce) with a `product_traker_data` JS object
+        // exposing sku/name/price/stock AND a structured saleType regulatory field --
+        // see apps/worker/src/scrapers/salcobrand.scraper.ts.
+        scraperEnabled: true,
       },
       {
         slug: "farmacias-ahumada",

@@ -3,6 +3,7 @@ import { eq } from "drizzle-orm";
 import { db } from "../../../web/src/db/index";
 import { pharmacyChains, scrapeRuns } from "../../../web/src/db/schema";
 import { fasaScraper } from "../scrapers/fasa.scraper";
+import { salcobrandScraper } from "../scrapers/salcobrand.scraper";
 import { persistScrapedProduct } from "../pipeline/persist";
 import type { PharmacyScraper } from "../scrapers/types";
 
@@ -11,6 +12,12 @@ const USER_AGENT =
 
 const scrapers: Record<string, PharmacyScraper> = {
   "farmacias-ahumada": fasaScraper,
+  salcobrand: salcobrandScraper,
+};
+
+const SITEMAP_URLS: Record<string, string> = {
+  "farmacias-ahumada": "https://www.farmaciasahumada.cl/sitemap_0-product.xml",
+  salcobrand: "https://salcobrand.cl/sitemap3.xml",
 };
 
 function delay(ms: number) {
@@ -22,13 +29,17 @@ function delay(ms: number) {
  * that clear within a few seconds), not a hard block. Retry with backoff instead of
  * failing the whole run on a transient hit.
  */
-async function getProductUrlsFromSitemap(sitemapUrl: string, limit: number): Promise<string[]> {
+async function getProductUrlsFromSitemap(
+  sitemapUrl: string,
+  limit: number,
+  urlFilter: (url: string) => boolean = () => true,
+): Promise<string[]> {
   const maxAttempts = 4;
   for (let attempt = 1; attempt <= maxAttempts; attempt++) {
     const res = await fetch(sitemapUrl, { headers: { "User-Agent": USER_AGENT } });
     if (res.ok) {
       const xml = await res.text();
-      const matches = [...xml.matchAll(/<loc>([^<]+)<\/loc>/g)].map((m) => m[1]);
+      const matches = [...xml.matchAll(/<loc>([^<]+)<\/loc>/g)].map((m) => m[1]).filter(urlFilter);
       return matches.slice(0, limit);
     }
     console.warn(`  sitemap fetch got ${res.status} (attempt ${attempt}/${maxAttempts})`);
@@ -36,6 +47,11 @@ async function getProductUrlsFromSitemap(sitemapUrl: string, limit: number): Pro
   }
   throw new Error(`Failed to fetch sitemap after ${maxAttempts} attempts: ${sitemapUrl}`);
 }
+
+// Salcobrand's sitemap mixes non-product listing/category pages in with real products.
+const SITEMAP_URL_FILTERS: Record<string, (url: string) => boolean> = {
+  salcobrand: (url) => /\/products\/.+/.test(url),
+};
 
 async function main() {
   const chainSlug = process.argv.find((a) => a.startsWith("--chain="))?.split("=")[1];
@@ -68,8 +84,9 @@ async function main() {
     } else {
       console.log(`Fetching product URLs for ${chainSlug} from sitemap (limit ${limit})...`);
       productUrls = await getProductUrlsFromSitemap(
-        "https://www.farmaciasahumada.cl/sitemap_0-product.xml",
+        SITEMAP_URLS[chainSlug],
         limit,
+        SITEMAP_URL_FILTERS[chainSlug],
       );
     }
     console.log(`Got ${productUrls.length} URLs. Scraping...`);

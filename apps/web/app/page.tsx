@@ -22,6 +22,12 @@ export default function Home() {
             Buscar
           </button>
         </form>
+        <a
+          href="/promociones"
+          className="mt-4 inline-block text-sm text-emerald-700 hover:underline dark:text-emerald-400"
+        >
+          Ver promociones activas →
+        </a>
       </div>
     </div>
   );

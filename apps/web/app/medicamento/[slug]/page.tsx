@@ -84,7 +84,10 @@ export default async function MedicamentoPage({
               <li key={mapping.id} className="flex items-center justify-between gap-4 p-4">
                 <div>
                   <p className="font-medium text-zinc-900 dark:text-zinc-50">
-                    {chain.name} {i === 0 && <span className="ml-1 text-xs text-emerald-600">· más barato</span>}
+                    <Link href={`/farmacia/${chain.slug}`} className="hover:underline">
+                      {chain.name}
+                    </Link>{" "}
+                    {i === 0 && <span className="ml-1 text-xs text-emerald-600">· más barato</span>}
                   </p>
                   <p className="text-xs text-zinc-500">
                     actualizado {timeAgo(latestPrice!.scrapedAt)}
