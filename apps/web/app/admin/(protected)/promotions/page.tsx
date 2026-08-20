@@ -69,7 +69,7 @@ export default async function AdminPromotionsPage() {
           <input type="checkbox" name="requiresConvenio" /> Requiere convenio (ej. caja de compensación)
         </label>
         <input name="sourceUrl" placeholder="URL fuente" className="w-full rounded border border-zinc-300 px-2 py-1.5 dark:border-zinc-700 dark:bg-zinc-900" />
-        <button type="submit" className="rounded-md bg-emerald-600 px-4 py-2 text-sm font-medium text-white">
+        <button type="submit" className="rounded-md bg-brand px-4 py-2 text-sm font-medium text-white">
           Agregar promoción
         </button>
       </form>

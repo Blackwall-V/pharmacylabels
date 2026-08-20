@@ -4,6 +4,10 @@ import { eq, and, inArray, desc } from "drizzle-orm";
 import { db } from "@/src/db";
 import { medications, chainProductMappings, pharmacyChains, prices } from "@/src/db/schema";
 import { RegulatoryBadge } from "@/components/RegulatoryBadge";
+import { PriceTicket } from "@/components/PriceTicket";
+import { PillIcon } from "@/components/PillIcon";
+
+export const dynamic = "force-dynamic";
 
 function timeAgo(date: Date): string {
   const minutes = Math.round((Date.now() - date.getTime()) / 60000);
@@ -50,58 +54,66 @@ export default async function MedicamentoPage({
     .filter((r) => r.latestPrice)
     .sort((a, b) => a.latestPrice!.priceClp - b.latestPrice!.priceClp);
 
+  const cheapest = sortedRows[0]?.latestPrice?.priceClp;
+  const priciest = sortedRows[sortedRows.length - 1]?.latestPrice?.priceClp;
+  const savings = cheapest && priciest && priciest > cheapest ? priciest - cheapest : null;
+
   return (
     <div className="mx-auto max-w-2xl px-6 py-10">
-      <Link href="/buscar" className="text-sm text-emerald-700 hover:underline dark:text-emerald-400">
+      <Link href="/buscar" className="text-sm font-medium text-brand hover:underline">
         ← Volver a la búsqueda
       </Link>
 
       <div className="mt-4 flex flex-wrap items-start justify-between gap-4">
-        <div className="min-w-0">
-          <h1 className="break-words text-2xl font-semibold text-zinc-900 dark:text-zinc-50">
-            {medication.canonicalName}
-          </h1>
-          {medication.activeIngredient && (
-            <p className="text-zinc-500">
-              {medication.activeIngredient}
-              {medication.dosage ? ` · ${medication.dosage}` : ""}
-              {medication.presentation ? ` · ${medication.presentation}` : ""}
-            </p>
-          )}
+        <div className="flex min-w-0 items-start gap-3">
+          <span className="mt-1 flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-brand-mint text-brand">
+            <PillIcon />
+          </span>
+          <div className="min-w-0">
+            <h1 className="font-display text-2xl font-semibold break-words text-ink">
+              {medication.canonicalName}
+            </h1>
+            {medication.activeIngredient && (
+              <p className="text-ink-soft">
+                {medication.activeIngredient}
+                {medication.dosage ? ` · ${medication.dosage}` : ""}
+                {medication.presentation ? ` · ${medication.presentation}` : ""}
+              </p>
+            )}
+          </div>
         </div>
         <span className="shrink-0">
           <RegulatoryBadge regulatoryClass={medication.regulatoryClass} />
         </span>
       </div>
 
-      <div className="mt-8">
+      {savings && (
+        <div className="mt-6 flex items-center gap-3 rounded-2xl bg-price-soft px-4 py-3">
+          <span className="font-data text-lg font-bold text-price">
+            Ahorra ${savings.toLocaleString("es-CL")}
+          </span>
+          <span className="text-sm text-ink-soft">eligiendo la farmacia más barata</span>
+        </div>
+      )}
+
+      <div className="mt-6 space-y-3">
         {sortedRows.length === 0 ? (
-          <p className="rounded-md border border-dashed border-zinc-300 p-6 text-center text-zinc-500 dark:border-zinc-700">
+          <p className="rounded-2xl border border-dashed border-line bg-surface p-6 text-center text-ink-soft">
             Todavía no hay precios confirmados de ninguna cadena para este medicamento. Los productos
             recién scrapeados pasan primero por una cola de revisión manual antes de aparecer aquí.
           </p>
         ) : (
-          <ul className="divide-y divide-zinc-200 rounded-md border border-zinc-200 dark:divide-zinc-800 dark:border-zinc-800">
-            {sortedRows.map(({ mapping, chain, latestPrice }, i) => (
-              <li key={mapping.id} className="flex items-center justify-between gap-4 p-4">
-                <div className="min-w-0">
-                  <p className="truncate font-medium text-zinc-900 dark:text-zinc-50">
-                    <Link href={`/farmacia/${chain.slug}`} className="hover:underline">
-                      {chain.name}
-                    </Link>{" "}
-                    {i === 0 && <span className="ml-1 text-xs text-emerald-600">· más barato</span>}
-                  </p>
-                  <p className="truncate text-xs text-zinc-500">
-                    actualizado {timeAgo(latestPrice!.scrapedAt)}
-                    {!latestPrice!.inStock && " · sin stock"}
-                  </p>
-                </div>
-                <p className="shrink-0 text-lg font-semibold text-zinc-900 dark:text-zinc-50">
-                  ${latestPrice!.priceClp.toLocaleString("es-CL")}
-                </p>
-              </li>
-            ))}
-          </ul>
+          sortedRows.map(({ mapping, chain, latestPrice }, i) => (
+            <PriceTicket
+              key={mapping.id}
+              chainSlug={chain.slug}
+              chainName={chain.name}
+              priceClp={latestPrice!.priceClp}
+              freshnessLabel={`actualizado ${timeAgo(latestPrice!.scrapedAt)}`}
+              inStock={latestPrice!.inStock}
+              isCheapest={i === 0}
+            />
+          ))
         )}
       </div>
     </div>

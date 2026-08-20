@@ -1,26 +1,99 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  /* Paper: cool neutral, not the cream-editorial default */
+  --paper: #f5f4ef;
+  --surface: #ffffff;
+  --surface-sunken: #eeece4;
+  --ink: #17251d;
+  --ink-soft: #4a564c;
+  --line: #dedad0;
+
+  /* Brand: deep pharmacy green -- the site's own color, distinct from any one chain */
+  --brand: #1f6e52;
+  --brand-strong: #123f2f;
+  --brand-mint: #e2efe6;
+
+  /* Price / savings signal -- a price-tag red-orange, not a muted terracotta */
+  --price: #cf4520;
+  --price-soft: #fbe6dd;
+
+  /* Regulatory classification */
+  --otc: #1f6e52;
+  --otc-soft: #e2efe6;
+  --simple: #a86616;
+  --simple-soft: #f6e9d3;
+  --retenida: #9c332f;
+  --retenida-soft: #f6dfdd;
 }
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --color-paper: var(--paper);
+  --color-surface: var(--surface);
+  --color-surface-sunken: var(--surface-sunken);
+  --color-ink: var(--ink);
+  --color-ink-soft: var(--ink-soft);
+  --color-line: var(--line);
+  --color-brand: var(--brand);
+  --color-brand-strong: var(--brand-strong);
+  --color-brand-mint: var(--brand-mint);
+  --color-price: var(--price);
+  --color-price-soft: var(--price-soft);
+  --color-otc: var(--otc);
+  --color-otc-soft: var(--otc-soft);
+  --color-simple: var(--simple);
+  --color-simple-soft: var(--simple-soft);
+  --color-retenida: var(--retenida);
+  --color-retenida-soft: var(--retenida-soft);
+
+  --font-display: var(--font-space-grotesk);
+  --font-sans: var(--font-inter);
+  --font-data: var(--font-plex-mono);
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+    --paper: #101c16;
+    --surface: #16261e;
+    --surface-sunken: #0c1712;
+    --ink: #eaf3ec;
+    --ink-soft: #a9beac;
+    --line: #23392c;
+
+    --brand: #4fae85;
+    --brand-strong: #7cc9a5;
+    --brand-mint: #17301f;
+
+    --price: #ff8156;
+    --price-soft: #3a2018;
+
+    --otc: #4fae85;
+    --otc-soft: #17301f;
+    --simple: #d9a34c;
+    --simple-soft: #33270f;
+    --retenida: #e07c76;
+    --retenida-soft: #351815;
   }
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--font-sans);
+}
+
+/* The signature "price ticket" punch-hole: a small circle matching the page
+   background, cut into the left edge of each price row -- evokes a printed
+   price tag. Only works because tickets always sit directly on --paper. */
+.ticket-punch::before {
+  content: "";
+  position: absolute;
+  left: -8px;
+  top: 50%;
+  width: 16px;
+  height: 16px;
+  border-radius: 9999px;
+  background: var(--paper);
+  transform: translateY(-50%);
+  border: 1px solid var(--line);
 }

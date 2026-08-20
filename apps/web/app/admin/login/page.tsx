@@ -21,7 +21,7 @@ export default async function AdminLoginPage({
           placeholder="Contraseña"
           className="w-full rounded border border-zinc-300 px-3 py-2 dark:border-zinc-700 dark:bg-zinc-900"
         />
-        <button type="submit" className="w-full rounded-md bg-emerald-600 px-4 py-2 font-medium text-white">
+        <button type="submit" className="w-full rounded-md bg-brand px-4 py-2 font-medium text-white">
           Entrar
         </button>
       </form>

@@ -2,6 +2,7 @@ import Link from "next/link";
 import { eq, desc } from "drizzle-orm";
 import { db } from "@/src/db";
 import { promotions, pharmacyChains } from "@/src/db/schema";
+import { ChainBadge } from "@/components/ChainBadge";
 
 // Without this, Next.js statically optimizes this page at build time (no cookies/
 // searchParams/params to signal otherwise) and would serve a frozen snapshot of
@@ -20,31 +21,45 @@ export default async function PromocionesPage() {
 
   return (
     <div className="mx-auto max-w-2xl px-6 py-10">
-      <Link href="/" className="text-sm text-emerald-700 hover:underline dark:text-emerald-400">
-        ← Farmacompara
-      </Link>
-      <h1 className="mt-4 text-2xl font-semibold text-zinc-900 dark:text-zinc-50">Promociones activas</h1>
+      <h1 className="font-display text-2xl font-semibold text-ink">Promociones activas</h1>
+      <p className="mt-1 text-sm text-ink-soft">
+        Descuentos vigentes en las farmacias que seguimos, cargados a mano y verificados en la
+        fuente.
+      </p>
 
       <ul className="mt-6 space-y-4">
         {active.map(({ promotion, chain }) => (
-          <li key={promotion.id} className="rounded-md border border-zinc-200 p-4 dark:border-zinc-800">
+          <li key={promotion.id} className="rounded-2xl border border-line bg-surface p-5">
             <div className="flex flex-wrap items-center justify-between gap-x-4 gap-y-1">
-              <p className="min-w-0 break-words font-medium text-zinc-900 dark:text-zinc-50">{promotion.title}</p>
-              <Link href={`/farmacia/${chain.slug}`} className="shrink-0 text-sm text-emerald-700 hover:underline dark:text-emerald-400">
-                {chain.name}
+              <p className="min-w-0 font-display font-semibold break-words text-ink">
+                {promotion.title}
+              </p>
+              <Link
+                href={`/farmacia/${chain.slug}`}
+                className="shrink-0 text-sm font-medium text-brand hover:underline"
+              >
+                <ChainBadge slug={chain.slug} name={chain.name} />
               </Link>
             </div>
-            {promotion.description && <p className="mt-1 text-sm text-zinc-600 dark:text-zinc-400">{promotion.description}</p>}
-            <div className="mt-2 flex flex-wrap gap-2 text-xs text-zinc-500">
+            {promotion.description && (
+              <p className="mt-2 text-sm text-ink-soft">{promotion.description}</p>
+            )}
+            <div className="mt-3 flex flex-wrap gap-2 text-xs text-ink-soft">
               {promotion.daysOfWeek && promotion.daysOfWeek.length > 0 && (
-                <span>Válido: {promotion.daysOfWeek.map((d) => DAY_LABELS[d]).join(", ")}</span>
+                <span className="rounded-full bg-brand-mint px-2.5 py-1 text-brand">
+                  {promotion.daysOfWeek.map((d) => DAY_LABELS[d]).join(", ")}
+                </span>
               )}
-              {promotion.requiresConvenio && <span>· Requiere convenio</span>}
+              {promotion.requiresConvenio && (
+                <span className="rounded-full bg-surface-sunken px-2.5 py-1">
+                  Requiere convenio
+                </span>
+              )}
             </div>
           </li>
         ))}
         {active.length === 0 && (
-          <li className="rounded-md border border-dashed border-zinc-300 p-6 text-center text-zinc-500 dark:border-zinc-700">
+          <li className="rounded-2xl border border-dashed border-line bg-surface p-10 text-center text-ink-soft">
             Todavía no hay promociones cargadas.
           </li>
         )}

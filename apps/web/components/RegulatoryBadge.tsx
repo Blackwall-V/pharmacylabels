@@ -1,28 +1,21 @@
-const LABELS: Record<string, { text: string; className: string }> = {
-  venta_libre: {
-    text: "Venta libre",
-    className: "bg-emerald-100 text-emerald-800 dark:bg-emerald-900/40 dark:text-emerald-300",
-  },
-  receta_simple: {
-    text: "Receta simple",
-    className: "bg-amber-100 text-amber-800 dark:bg-amber-900/40 dark:text-amber-300",
-  },
-  receta_retenida: {
-    text: "Receta retenida",
-    className: "bg-red-100 text-red-800 dark:bg-red-900/40 dark:text-red-300",
-  },
+const LABELS: Record<string, { text: string; fg: string; bg: string }> = {
+  venta_libre: { text: "Venta libre", fg: "text-otc", bg: "bg-otc-soft" },
+  receta_simple: { text: "Receta simple", fg: "text-simple", bg: "bg-simple-soft" },
+  receta_retenida: { text: "Receta retenida", fg: "text-retenida", bg: "bg-retenida-soft" },
 };
 
 export function RegulatoryBadge({ regulatoryClass }: { regulatoryClass: string | null }) {
   if (!regulatoryClass || !LABELS[regulatoryClass]) {
     return (
-      <span className="inline-block rounded-full bg-zinc-100 px-3 py-1 text-xs font-medium text-zinc-600 dark:bg-zinc-800 dark:text-zinc-400">
+      <span className="inline-flex items-center rounded-full bg-surface-sunken px-2.5 py-1 text-xs font-medium text-ink-soft">
         Sin clasificar
       </span>
     );
   }
-  const { text, className } = LABELS[regulatoryClass];
+  const { text, fg, bg } = LABELS[regulatoryClass];
   return (
-    <span className={`inline-block rounded-full px-3 py-1 text-xs font-medium ${className}`}>{text}</span>
+    <span className={`inline-flex items-center rounded-full px-2.5 py-1 text-xs font-medium ${bg} ${fg}`}>
+      {text}
+    </span>
   );
 }

@@ -59,7 +59,7 @@ export default async function MatchingQueuePage() {
                   <input type="hidden" name="medicationId" value={c.id} />
                   <button
                     type="submit"
-                    className="rounded-full border border-emerald-300 px-3 py-1 text-sm text-emerald-800 hover:bg-emerald-50 dark:border-emerald-800 dark:text-emerald-300 dark:hover:bg-emerald-900/30"
+                    className="rounded-full border border-brand/30 px-3 py-1 text-sm text-brand hover:bg-brand-mint"
                   >
                     {c.canonical_name} ({(c.similarity * 100).toFixed(0)}%)
                   </button>

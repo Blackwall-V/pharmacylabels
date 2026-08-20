@@ -1,7 +1,9 @@
-import Link from "next/link";
 import { sql } from "drizzle-orm";
 import { db } from "@/src/db";
-import { RegulatoryBadge } from "@/components/RegulatoryBadge";
+import { SearchBar } from "@/components/SearchBar";
+import { MedicationCard } from "@/components/MedicationCard";
+
+export const dynamic = "force-dynamic";
 
 interface MedicationRow {
   [key: string]: unknown;
@@ -27,9 +29,11 @@ async function searchMedications(query: string): Promise<MedicationRow[]> {
     where similarity(lower(canonical_name), lower(${query})) > 0.1
        or similarity(lower(coalesce(active_ingredient, '')), lower(${query})) > 0.1
        or lower(canonical_name) like '%' || lower(${query}) || '%'
+       or lower(coalesce(category, '')) like '%' || lower(${query}) || '%'
     order by greatest(
       similarity(lower(canonical_name), lower(${query})),
-      similarity(lower(coalesce(active_ingredient, '')), lower(${query}))
+      similarity(lower(coalesce(active_ingredient, '')), lower(${query})),
+      case when lower(coalesce(category, '')) like '%' || lower(${query}) || '%' then 0.5 else 0 end
     ) desc
     limit 30
   `);
@@ -44,46 +48,36 @@ export default async function BuscarPage({
   const results = await searchMedications(q);
 
   return (
-    <div className="mx-auto max-w-2xl px-6 py-10">
-      <Link href="/" className="text-sm text-emerald-700 hover:underline dark:text-emerald-400">
-        ← Farmacompara
-      </Link>
-      <form action="/buscar" className="mt-4 flex gap-2">
-        <input
-          type="text"
-          name="q"
-          defaultValue={q}
-          placeholder="Buscar medicamento..."
-          className="min-w-0 flex-1 rounded-md border border-zinc-300 px-4 py-2 dark:border-zinc-700 dark:bg-zinc-900"
-        />
-        <button type="submit" className="rounded-md bg-emerald-600 px-5 py-2 font-medium text-white">
-          Buscar
-        </button>
-      </form>
+    <div className="mx-auto max-w-5xl px-6 py-10">
+      <SearchBar defaultValue={q} />
 
-      <ul className="mt-6 divide-y divide-zinc-200 dark:divide-zinc-800">
-        {results.map((med) => (
-          <li key={med.id} className="py-4">
-            <Link
-              href={`/medicamento/${med.slug}`}
-              className="flex items-center justify-between gap-4 hover:text-emerald-700 dark:hover:text-emerald-400"
-            >
-              <div className="min-w-0">
-                <p className="truncate font-medium text-zinc-900 dark:text-zinc-50">{med.canonical_name}</p>
-                {med.active_ingredient && (
-                  <p className="truncate text-sm text-zinc-500">{med.active_ingredient}</p>
-                )}
-              </div>
-              <span className="shrink-0">
-                <RegulatoryBadge regulatoryClass={med.regulatory_class} />
-              </span>
-            </Link>
-          </li>
-        ))}
-        {results.length === 0 && (
-          <li className="py-8 text-center text-zinc-500">No se encontraron medicamentos para “{q}”.</li>
+      <p className="mt-6 text-sm text-ink-soft">
+        {q ? (
+          <>
+            {results.length} resultado{results.length === 1 ? "" : "s"} para “{q}”
+          </>
+        ) : (
+          "Catálogo completo"
         )}
-      </ul>
+      </p>
+
+      {results.length > 0 ? (
+        <div className="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          {results.map((med) => (
+            <MedicationCard
+              key={med.id}
+              slug={med.slug}
+              canonicalName={med.canonical_name}
+              activeIngredient={med.active_ingredient}
+              regulatoryClass={med.regulatory_class}
+            />
+          ))}
+        </div>
+      ) : (
+        <div className="mt-4 rounded-2xl border border-dashed border-line bg-surface p-10 text-center text-ink-soft">
+          No encontramos medicamentos para “{q}”. Prueba con el nombre del principio activo.
+        </div>
+      )}
     </div>
   );
 }

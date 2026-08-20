@@ -36,7 +36,7 @@ export default async function AdminMedicationsPage() {
             <option key={o.value} value={o.value}>{o.label}</option>
           ))}
         </select>
-        <button type="submit" className="rounded-md bg-emerald-600 px-4 py-1.5 text-sm font-medium text-white sm:col-span-2">
+        <button type="submit" className="rounded-md bg-brand px-4 py-1.5 text-sm font-medium text-white sm:col-span-2">
           Agregar medicamento
         </button>
       </form>
