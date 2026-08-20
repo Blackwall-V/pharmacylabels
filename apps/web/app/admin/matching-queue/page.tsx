@@ -2,7 +2,7 @@ import { eq } from "drizzle-orm";
 import { sql } from "drizzle-orm";
 import { db } from "@/src/db";
 import { chainProductMappings, pharmacyChains } from "@/src/db/schema";
-import { confirmMapping, rejectMapping } from "../actions";
+import { confirmMapping, rejectMapping, createMedicationFromMapping } from "../actions";
 
 interface CandidateRow {
   [key: string]: unknown;
@@ -71,6 +71,22 @@ export default async function MatchingQueuePage() {
                 </button>
               </form>
             </div>
+
+            <form action={createMedicationFromMapping} className="mt-3 flex gap-2">
+              <input type="hidden" name="mappingId" value={mapping.id} />
+              <input
+                name="canonicalName"
+                defaultValue={mapping.chainProductName}
+                placeholder="Nombre canónico del medicamento nuevo"
+                className="flex-1 rounded border border-zinc-300 px-2 py-1 text-sm dark:border-zinc-700 dark:bg-zinc-900"
+              />
+              <button
+                type="submit"
+                className="whitespace-nowrap rounded-md bg-zinc-900 px-3 py-1 text-sm text-white hover:bg-zinc-700 dark:bg-zinc-100 dark:text-zinc-900"
+              >
+                Crear como medicamento nuevo
+              </button>
+            </form>
           </li>
         ))}
         {withCandidates.length === 0 && (
