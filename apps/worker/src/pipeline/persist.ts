@@ -1,8 +1,17 @@
-import { eq, and } from "drizzle-orm";
+import { eq, and, isNull } from "drizzle-orm";
 import { db } from "../../../web/src/db/index";
-import { pharmacyChains, chainProductMappings, prices } from "../../../web/src/db/schema";
+import { pharmacyChains, chainProductMappings, prices, medications } from "../../../web/src/db/schema";
 import type { ScrapedProduct } from "../scrapers/types";
 import { matchProductToMedication, isAutoConfirm } from "./match";
+
+/** Only fills in a canonical image the first time -- never overwrites a curated choice. */
+async function applyImageIfMissing(medicationId: number, imageUrl: string | undefined) {
+  if (!imageUrl) return;
+  await db
+    .update(medications)
+    .set({ imageUrl })
+    .where(and(eq(medications.id, medicationId), isNull(medications.imageUrl)));
+}
 
 export async function persistScrapedProduct(chainSlug: string, product: ScrapedProduct) {
   const [chain] = await db
@@ -26,8 +35,12 @@ export async function persistScrapedProduct(chainSlug: string, product: ScrapedP
     mappingId = existingMapping.id;
     await db
       .update(chainProductMappings)
-      .set({ lastSeenAt: new Date(), chainProductName: product.rawName })
+      .set({ lastSeenAt: new Date(), chainProductName: product.rawName, imageUrl: product.imageUrl })
       .where(eq(chainProductMappings.id, mappingId));
+
+    if (existingMapping.medicationId) {
+      await applyImageIfMissing(existingMapping.medicationId, product.imageUrl);
+    }
   } else {
     const { medicationId, confidence } = await matchProductToMedication(product.rawName);
     const autoConfirm = medicationId !== null && isAutoConfirm(confidence);
@@ -40,6 +53,7 @@ export async function persistScrapedProduct(chainSlug: string, product: ScrapedP
         chainSku: product.sku,
         chainProductName: product.rawName,
         chainProductUrl: product.productUrl,
+        imageUrl: product.imageUrl,
         matchStatus: autoConfirm ? "auto_matched" : "pending_review",
         matchConfidence: confidence,
         matchedBy: autoConfirm ? "algorithm" : null,
@@ -49,6 +63,7 @@ export async function persistScrapedProduct(chainSlug: string, product: ScrapedP
 
     if (autoConfirm) {
       console.log(`  matched -> medication #${medicationId} (confidence ${confidence.toFixed(2)})`);
+      await applyImageIfMissing(medicationId!, product.imageUrl);
     } else {
       console.log(`  pending_review (best confidence ${confidence.toFixed(2)})`);
     }

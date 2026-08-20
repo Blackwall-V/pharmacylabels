@@ -1,6 +1,6 @@
 "use server";
 
-import { eq } from "drizzle-orm";
+import { eq, and, isNull } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { db } from "@/src/db";
@@ -17,6 +17,15 @@ async function requireAdmin() {
   }
 }
 
+/** Only fills in a canonical image the first time -- never overwrites a curated choice. */
+async function applyImageIfMissing(medicationId: number, imageUrl: string | null) {
+  if (!imageUrl) return;
+  await db
+    .update(medications)
+    .set({ imageUrl })
+    .where(and(eq(medications.id, medicationId), isNull(medications.imageUrl)));
+}
+
 export async function confirmMapping(formData: FormData) {
   await requireAdmin();
   const mappingId = parseId(formData.get("mappingId"));
@@ -27,7 +36,16 @@ export async function confirmMapping(formData: FormData) {
     .update(chainProductMappings)
     .set({ medicationId, matchStatus: "confirmed", matchedBy: "manual" })
     .where(eq(chainProductMappings.id, mappingId));
+
+  const [mapping] = await db
+    .select({ imageUrl: chainProductMappings.imageUrl })
+    .from(chainProductMappings)
+    .where(eq(chainProductMappings.id, mappingId))
+    .limit(1);
+  await applyImageIfMissing(medicationId, mapping?.imageUrl ?? null);
+
   revalidatePath("/admin/matching-queue");
+  revalidatePath("/buscar");
 }
 
 export async function createMedicationFromMapping(formData: FormData) {
@@ -35,6 +53,12 @@ export async function createMedicationFromMapping(formData: FormData) {
   const mappingId = parseId(formData.get("mappingId"));
   const canonicalName = parseRequiredName(formData.get("canonicalName"));
   if (!mappingId || !canonicalName) return;
+
+  const [mapping] = await db
+    .select({ imageUrl: chainProductMappings.imageUrl })
+    .from(chainProductMappings)
+    .where(eq(chainProductMappings.id, mappingId))
+    .limit(1);
 
   let slug = slugify(canonicalName);
   const [clash] = await db.select().from(medications).where(eq(medications.slug, slug)).limit(1);
@@ -45,6 +69,7 @@ export async function createMedicationFromMapping(formData: FormData) {
     .values({
       slug,
       canonicalName,
+      imageUrl: mapping?.imageUrl ?? null,
       regulatoryClassSource: "manual_curated",
     })
     .returning();

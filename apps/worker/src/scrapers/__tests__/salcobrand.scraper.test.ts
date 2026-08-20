@@ -8,7 +8,7 @@ function pageWithSaleType(saleType: string | undefined) {
   return `
 <html><body>
 <script type="text/javascript">
-var product_traker_data = {"groupId":22656,"name":"Clonazepam (B) 2mg 30 Comprimidos","price":"5103.0","isAvailable":true,"url":"https://salcobrand.cl/products/clonazepam-b-2mg-30-comprimidos","productIDs":["430254"],"products":{"430254":{"isAvailable":true}},"params":{"badge":null${saleTypeField}}};
+var product_traker_data = {"groupId":22656,"name":"Clonazepam (B) 2mg 30 Comprimidos","price":"5103.0","isAvailable":true,"url":"https://salcobrand.cl/products/clonazepam-b-2mg-30-comprimidos","pictureUrl":"https://static.salcobrand.cl/spree/products/105594/small/430254.jpg","productIDs":["430254"],"products":{"430254":{"isAvailable":true}},"params":{"badge":null${saleTypeField}}};
 </script>
 </body></html>
 `;
@@ -21,6 +21,7 @@ describe("salcobrand.scraper parseProductHtml", () => {
     expect(result?.sku).toBe("430254");
     expect(result?.priceClp).toBe(5103);
     expect(result?.inStock).toBe(true);
+    expect(result?.imageUrl).toBe("https://static.salcobrand.cl/spree/products/105594/small/430254.jpg");
   });
 
   it("maps saleType=prescription to receta_simple (confirmed against amoxicilina)", () => {

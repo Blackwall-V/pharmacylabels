@@ -12,6 +12,16 @@ function apiResponse(overrides: Record<string, unknown> = {}) {
       price: 27990,
       prices: { "price-list-cl": 27990, "price-sale-cl": 22392 },
       stock: 267,
+      imageGroups: [
+        {
+          images: [
+            {
+              dis_base_link: "https://beta.cruzverde.cl/dw/image/v2/BDPM_PRD/images/large/1006.jpg",
+              link: "https://beta.cruzverde.cl/dw/image/v2/BDPM_PRD/images/large/1006.jpg",
+            },
+          ],
+        },
+      ],
       ...overrides,
     },
   });
@@ -23,6 +33,12 @@ describe("cruzverde.scraper parseApiResponse", () => {
     expect(result?.priceClp).toBe(22392);
     expect(result?.sku).toBe("1006");
     expect(result?.inStock).toBe(true);
+    expect(result?.imageUrl).toBe("https://beta.cruzverde.cl/dw/image/v2/BDPM_PRD/images/large/1006.jpg");
+  });
+
+  it("returns undefined imageUrl when there are no imageGroups", () => {
+    const result = parseApiResponse(apiResponse({ imageGroups: undefined }), "https://example.com");
+    expect(result?.imageUrl).toBeUndefined();
   });
 
   it("falls back to the list price when there is no sale price", () => {

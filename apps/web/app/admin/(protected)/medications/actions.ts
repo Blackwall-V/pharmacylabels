@@ -6,7 +6,14 @@ import { db } from "@/src/db";
 import { medications } from "@/src/db/schema";
 import { verifyAdminSession } from "@/src/lib/session";
 import { slugify } from "@/src/lib/slugify";
-import { parseId, parseRequiredName, parseOptionalText, parseEnum, REGULATORY_CLASSES } from "@/src/lib/validation";
+import {
+  parseId,
+  parseRequiredName,
+  parseOptionalText,
+  parseOptionalUrl,
+  parseEnum,
+  REGULATORY_CLASSES,
+} from "@/src/lib/validation";
 
 export async function createMedication(formData: FormData) {
   if (!(await verifyAdminSession())) throw new Error("Unauthorized");
@@ -27,6 +34,7 @@ export async function createMedication(formData: FormData) {
     dosage: parseOptionalText(formData.get("dosage"), 100),
     presentation: parseOptionalText(formData.get("presentation"), 100),
     category: parseOptionalText(formData.get("category"), 100),
+    imageUrl: parseOptionalUrl(formData.get("imageUrl")),
     regulatoryClass,
     regulatoryClassSource: regulatoryClass ? "manual_curated" : null,
   });
@@ -50,6 +58,21 @@ export async function updateRegulatoryClass(formData: FormData) {
       regulatoryClassSource: regulatoryClass ? "manual_curated" : null,
       updatedAt: new Date(),
     })
+    .where(eq(medications.id, medicationId));
+
+  revalidatePath("/admin/medications");
+  revalidatePath("/buscar");
+}
+
+export async function updateImageUrl(formData: FormData) {
+  if (!(await verifyAdminSession())) throw new Error("Unauthorized");
+
+  const medicationId = parseId(formData.get("medicationId"));
+  if (!medicationId) return;
+
+  await db
+    .update(medications)
+    .set({ imageUrl: parseOptionalUrl(formData.get("imageUrl")), updatedAt: new Date() })
     .where(eq(medications.id, medicationId));
 
   revalidatePath("/admin/medications");

@@ -67,6 +67,7 @@ export default async function Home() {
                 canonicalName={m.canonicalName}
                 activeIngredient={m.activeIngredient}
                 regulatoryClass={m.regulatoryClass}
+                imageUrl={m.imageUrl}
               />
             ))}
           </div>

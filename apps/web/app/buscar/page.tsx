@@ -12,19 +12,20 @@ interface MedicationRow {
   canonical_name: string;
   active_ingredient: string | null;
   regulatory_class: string | null;
+  image_url: string | null;
 }
 
 async function searchMedications(query: string): Promise<MedicationRow[]> {
   if (!query.trim()) {
     return db.execute<MedicationRow>(sql`
-      select id, slug, canonical_name, active_ingredient, regulatory_class
+      select id, slug, canonical_name, active_ingredient, regulatory_class, image_url
       from medications
       order by canonical_name
       limit 30
     `);
   }
   return db.execute<MedicationRow>(sql`
-    select id, slug, canonical_name, active_ingredient, regulatory_class
+    select id, slug, canonical_name, active_ingredient, regulatory_class, image_url
     from medications
     where similarity(lower(canonical_name), lower(${query})) > 0.1
        or similarity(lower(coalesce(active_ingredient, '')), lower(${query})) > 0.1
@@ -70,6 +71,7 @@ export default async function BuscarPage({
               canonicalName={med.canonical_name}
               activeIngredient={med.active_ingredient}
               regulatoryClass={med.regulatory_class}
+              imageUrl={med.image_url}
             />
           ))}
         </div>

@@ -6,7 +6,7 @@ import { parseProductHtml } from "../fasa.scraper";
 const PRESCRIPTION_PRODUCT_HTML = `
 <html><head>
 <script type="application/ld+json">
-{"@context":"http://schema.org/","@type":"Product","name":"Reflexan 10 mg x 20 Comprimidos Recubiertos","mpn":"6","sku":"6","brand":{"@type":"Thing","name":"Reflexan"},"offers":{"url":{},"@type":"Offer","priceCurrency":"CLP","price":"13719","availability":"http://schema.org/InStock"}}
+{"@context":"http://schema.org/","@type":"Product","name":"Reflexan 10 mg x 20 Comprimidos Recubiertos","mpn":"6","sku":"6","brand":{"@type":"Thing","name":"Reflexan"},"image":["https://www.farmaciasahumada.cl/dw/image/v2/BJVH_PRD/on/demandware.static/images/products/6/6.jpg"],"offers":{"url":{},"@type":"Offer","priceCurrency":"CLP","price":"13719","availability":"http://schema.org/InStock"}}
 </script>
 </head><body>
 <ul><li><span>Este producto requiere receta médica simple</span></li></ul>
@@ -35,6 +35,7 @@ describe("fasa.scraper parseProductHtml", () => {
       inStock: true,
       productUrl: "https://www.farmaciasahumada.cl/reflexan-6.html",
       regulatoryLabel: "Este producto requiere receta médica simple",
+      imageUrl: "https://www.farmaciasahumada.cl/dw/image/v2/BJVH_PRD/on/demandware.static/images/products/6/6.jpg",
     });
   });
 
@@ -42,6 +43,7 @@ describe("fasa.scraper parseProductHtml", () => {
     const result = parseProductHtml(OTC_PRODUCT_HTML, "https://www.farmaciasahumada.cl/paracetamol-1234.html");
     expect(result?.inStock).toBe(false);
     expect(result?.regulatoryLabel).toBeUndefined();
+    expect(result?.imageUrl).toBeUndefined();
     expect(result?.priceClp).toBe(1990);
   });
 

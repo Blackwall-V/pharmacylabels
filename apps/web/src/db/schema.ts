@@ -107,6 +107,9 @@ export const medications = pgTable(
     packSize: text("pack_size"),
     laboratory: text("laboratory"),
     category: text("category"),
+    // Copied from whichever chain_product_mapping was first confirmed against this
+    // medication -- a real photo of the actual product, not a stock/fabricated image.
+    imageUrl: text("image_url"),
     regulatoryClass: regulatoryClassEnum("regulatory_class"),
     regulatoryClassSource: regulatoryClassSourceEnum("regulatory_class_source"),
     ispRegistroSanitario: text("isp_registro_sanitario"),
@@ -129,6 +132,8 @@ export const chainProductMappings = pgTable(
     chainSku: text("chain_sku").notNull(),
     chainProductName: text("chain_product_name").notNull(),
     chainProductUrl: text("chain_product_url"),
+    // Real product photo scraped from the chain's own product page.
+    imageUrl: text("image_url"),
     matchStatus: matchStatusEnum("match_status").notNull().default("pending_review"),
     matchConfidence: doublePrecision("match_confidence"),
     matchedBy: matchedByEnum("matched_by"),

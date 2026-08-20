@@ -7,6 +7,7 @@ const USER_AGENT =
 interface ProductLd {
   sku?: string;
   name?: string;
+  image?: string[];
   offers?: { price?: string; priceCurrency?: string; availability?: string };
 }
 
@@ -69,6 +70,7 @@ export function parseProductHtml(html: string, url: string): ScrapedProduct | nu
     inStock: ld.offers.availability?.includes("InStock") ?? false,
     productUrl: url,
     regulatoryLabel,
+    imageUrl: ld.image?.[0],
   };
 }
 

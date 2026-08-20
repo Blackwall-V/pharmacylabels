@@ -66,9 +66,20 @@ export default async function MedicamentoPage({
 
       <div className="mt-4 flex flex-wrap items-start justify-between gap-4">
         <div className="flex min-w-0 items-start gap-3">
-          <span className="mt-1 flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-brand-mint text-brand">
-            <PillIcon />
-          </span>
+          {medication.imageUrl ? (
+            // Real product photo scraped from the chain's own page -- plain <img>
+            // since it's hotlinked from an external, unpredictable set of hosts.
+            // eslint-disable-next-line @next/next/no-img-element
+            <img
+              src={medication.imageUrl}
+              alt=""
+              className="h-14 w-14 shrink-0 rounded-xl border border-line bg-white object-contain p-1.5"
+            />
+          ) : (
+            <span className="mt-1 flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-brand-mint text-brand">
+              <PillIcon />
+            </span>
+          )}
           <div className="min-w-0">
             <h1 className="font-display text-2xl font-semibold break-words text-ink">
               {medication.canonicalName}

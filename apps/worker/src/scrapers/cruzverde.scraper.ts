@@ -18,6 +18,7 @@ interface CruzVerdeProductData {
   stock?: number;
   prescription?: "simple" | "restricted";
   activeIngredient?: string;
+  imageGroups?: { images?: { link?: string; dis_base_link?: string }[] }[];
 }
 
 function delay(ms: number) {
@@ -37,6 +38,7 @@ export function parseApiResponse(apiBody: string, url: string): ScrapedProduct |
   if (!data?.id || !data.name || typeof data.price !== "number") return null;
 
   const salePrice = data.prices?.["price-sale-cl"];
+  const firstImage = data.imageGroups?.[0]?.images?.[0];
 
   return {
     sku: data.id,
@@ -45,6 +47,7 @@ export function parseApiResponse(apiBody: string, url: string): ScrapedProduct |
     inStock: (data.stock ?? 0) > 0,
     productUrl: url,
     regulatoryLabel: regulatoryLabelFor(data.prescription),
+    imageUrl: firstImage?.link ?? firstImage?.dis_base_link,
   };
 }
 

@@ -18,6 +18,7 @@ interface ProductTrakerData {
   isAvailable?: boolean;
   productIDs?: string[];
   url?: string;
+  pictureUrl?: string;
   params?: { saleType?: string };
 }
 
@@ -69,6 +70,7 @@ export function parseProductHtml(html: string, url: string): ScrapedProduct | nu
     inStock: data.isAvailable ?? false,
     productUrl: url,
     regulatoryLabel,
+    imageUrl: data.pictureUrl,
   };
 }
 
